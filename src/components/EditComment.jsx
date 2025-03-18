@@ -1,4 +1,3 @@
-// src/components/EditComment.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,18 +11,36 @@ const EditComment = () => {
 
   const comment = comments.find((c) => c.id === parseInt(id));
 
-  const [title, setTitle] = useState(comment ? comment.title : '');
-  const [content, setContent] = useState(comment ? comment.content : '');
+  const [formData, setFormData] = useState({
+    title: comment?.title || '',
+    content: comment?.content || '',
+  });
+
+  useEffect(() => {
+    if (comment) {
+      setFormData({ title: comment.title, content: comment.content });
+    }
+  }, [comment]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title.trim() || !content.trim()) {
+
+    if (!formData.title.trim() || !formData.content.trim()) {
       alert('Both title and content are required.');
       return;
     }
-    const responsee = await dispatch(updateComment({ id: comment.id, title, content }));
-    if (responsee.payload.success) {
-        navigate('/comments');
+
+    const response = await dispatch(
+      updateComment({ id: comment.id, ...formData })
+    );
+
+    if (response.payload?.success) {
+      navigate('/comments');
     }
   };
 
@@ -32,22 +49,24 @@ const EditComment = () => {
   }
 
   return (
-    <div className='container'>
+    <div className="container">
       <h2>Edit Comment</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Title:</label>
           <input
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
           />
         </div>
         <div>
           <label>Content:</label>
           <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
           />
         </div>
         <button type="submit">Update</button>

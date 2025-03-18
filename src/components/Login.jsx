@@ -4,51 +4,71 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { loginUser } from '../redux/slices/authSlice';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const dispatch = useDispatch();
-    const { loading, error, token } = useSelector((state) => state.auth);
-    const navigate = useNavigate();
-
-    if (token) {
-        return <Navigate to="/comments" />;
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error, token } = useSelector((state) => state.auth);
+  
+  if (token) {
+    return <Navigate to="/comments" />;
+  }
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const result = await dispatch(loginUser(formData));
+    
+    if (result.payload?.success) {
+      navigate('/comments');
     }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const result = await dispatch(loginUser({ email, password }));
-        console.log(result, 'response');
-
-        if (result.payload.success) {
-            navigate('/comments');
-        }
-    };
-
-    return (
-        <div className='container'>
-            <h1>Login</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Loading...' : 'Login'}
-                </button>
-            </form>
+  };
+  
+  return (
+    <div className="container">
+      <h1>Login</h1>
+      
+      {error && <p className="error-message">{error}</p>}
+      
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
         </div>
-    );
+        
+        <div className="form-group">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        
+        <button type="submit" disabled={loading} className="submit-button">
+          {loading ? 'Loading...' : 'Login'}
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default Login;
