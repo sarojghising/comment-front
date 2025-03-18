@@ -5,6 +5,22 @@ import axios from 'axios';
 const API_URL = 'http://localhost:8000/api'; 
 
 
+// Async thunk for user login
+export const loginUser = createAsyncThunk(
+    '/login',
+    async ({ email, password }, { rejectWithValue }) => {
+      try {
+        const response = await axios.post(`${API_URL}/login`, { email, password });
+        localStorage.setItem('token', response.data.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response.data);
+      }
+    }
+  );
+
+
 export const registerUser = createAsyncThunk(
   '/register',
   async ({ name, email, password }, { rejectWithValue }) => {
@@ -18,6 +34,11 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const logoutUser = createAsyncThunk('auth/logout', async () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  });
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -26,8 +47,45 @@ const authSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+     checkToken:  (state) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            state.token = null;
+            state.user = null;
+        }
+     }
+  },
   extraReducers: (builder) => {
+    // login 
+    builder
+    .addCase(loginUser.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(loginUser.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload.data.user;
+      state.token = action.payload.data.token;
+    })
+    .addCase(loginUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload.message;
+    })
+
+    // logout
+    builder
+     .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+     .addCase(logoutUser.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+      })
+
+    // register 
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -45,4 +103,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { checkToken } = authSlice.actions;
 export default authSlice.reducer;

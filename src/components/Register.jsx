@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { registerUser } from "../redux/slices/authSlice";
 import { useState } from "react";
 
@@ -8,8 +8,13 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.auth);
-    
+    const { loading, error, token } = useSelector((state) => state.auth);
+
+    if (token) {
+        return <Navigate to="/comments" />;
+    }
+
+
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
