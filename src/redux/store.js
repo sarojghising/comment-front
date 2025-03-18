@@ -8,4 +8,7 @@ export const store = configureStore({
     auth: authReducer,
     comments: commentReducer,
   },
+  devTools: process.env.NODE_ENV !== 'production',
+
+
 });

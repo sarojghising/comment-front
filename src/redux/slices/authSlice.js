@@ -1,8 +1,7 @@
-// src/redux/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config/apiConfig';
 
-const API_URL = 'http://localhost:8000/api'; 
 
 
 // Async thunk for user login
@@ -10,7 +9,7 @@ export const loginUser = createAsyncThunk(
     '/login',
     async ({ email, password }, { rejectWithValue }) => {
       try {
-        const response = await axios.post(`${API_URL}/login`, { email, password });
+        const response = await axios.post(`${API_BASE_URL}/login`, { email, password });
         localStorage.setItem('token', response.data.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
         return response.data;
@@ -25,7 +24,7 @@ export const registerUser = createAsyncThunk(
   '/register',
   async ({ name, email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, { name, email, password });
+      const response = await axios.post(`${API_BASE_URL}/register`, { name, email, password });
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {

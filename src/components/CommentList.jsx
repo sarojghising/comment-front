@@ -24,16 +24,13 @@ const CommentList = () => {
     };
     
 
-    const handleLogout = () => {
-        dispatch(logoutUser());
-    };
+   
     useEffect(() => {
         dispatch(fetchComments());
     }, [dispatch]);
 
     return (
         <>
-            <button className='logoutbtn' onClick={handleLogout}>Logout</button>
             <div className='container'>
                 <h1>Comments</h1>
                 {loading && <p>Loading...</p>}
