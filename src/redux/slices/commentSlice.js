@@ -20,7 +20,6 @@ export const fetchComments = createAsyncThunk(
   }
 );
 
-// Async thunk for creating a comment
 export const createComment = createAsyncThunk(
   'comments/createComment',
   async ({ title, content }, { rejectWithValue }) => {
@@ -41,6 +40,41 @@ export const createComment = createAsyncThunk(
   }
 );
 
+export const deleteComment = createAsyncThunk(
+  'comments/deleteComment',
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${API_URL}/comments/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const updateComment = createAsyncThunk(
+  'comments/updateComment',
+  async ({ id, title, content }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/comments/${id}`,
+        { title, content },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  });
+
+
 const commentSlice = createSlice({
   name: 'comments',
   initialState: {
@@ -51,13 +85,12 @@ const commentSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // fetch all comments
       .addCase(fetchComments.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchComments.fulfilled, (state, action) => {
-         console.log('comments', action.payload);
-         
         state.loading = false;
         state.comments = action.payload.data;
       })
@@ -65,6 +98,7 @@ const commentSlice = createSlice({
         state.loading = false;
         state.error = action.payload.message;
       })
+      // create a new comment
       .addCase(createComment.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -76,7 +110,36 @@ const commentSlice = createSlice({
       .addCase(createComment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+      })
+      // delete a comment
+      .addCase(deleteComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        state.comments = state.comments.filter((comment) => comment.id !== action.payload);
+      })
+      .addCase(deleteComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      })
+
+      // update a comment
+      .addCase(updateComment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateComment.fulfilled, (state, action) => {
+        const updatedComment = action.payload;
+        state.comments = state.comments.map((comment) =>
+          comment.id === updatedComment.id ? updatedComment : comment
+        );
+      })
+      .addCase(updateComment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
       });
+     
   },
 });
 

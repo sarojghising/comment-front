@@ -1,13 +1,28 @@
 // src/components/CommentList.js
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchComments } from '../redux/slices/commentSlice';
+import { fetchComments,deleteComment } from '../redux/slices/commentSlice';
 import { logoutUser } from '../redux/slices/authSlice';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CommentList = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { comments, loading, error } = useSelector((state) => state.comments);
+
+
+    const handleEdit = (id) => {
+        navigate(`/comments/edit/${id}`);
+      };
+
+
+    const handleDelete = (id) => {
+        if (window.confirm('Are you sure you want to delete this comment?')) {
+          dispatch(deleteComment(id));
+          dispatch(fetchComments());
+        }
+    };
+    
 
     const handleLogout = () => {
         dispatch(logoutUser());
@@ -36,15 +51,16 @@ const CommentList = () => {
                     </thead>
                     <tbody>
                         {
-                            comments.length === 0 ? (<p>No comments Yet. Be First to add one !</p>)
+                            comments.length === 0 ? (<tr><td>No comments Yet. Be First to add one !</td></tr>)
                                 : (
                                     comments.map((comment) => (
                                         <tr key={comment.id}>
                                             <td>{comment.title}</td>
                                             <td>{comment.content}</td>
                                             <td>
-                                                <button style={{ 'marginRight': '1rem' }}>Edit</button>
-                                                <button>Delete</button>
+                                                <button style={{ 'marginRight': '1rem' }}
+                                                 onClick={() => handleEdit(comment.id)}>Edit</button>
+                                                <button onClick={() => handleDelete(comment.id)}>Delete</button>
                                             </td>
                                         </tr>
                                     ))

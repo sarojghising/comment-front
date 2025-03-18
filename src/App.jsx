@@ -7,6 +7,7 @@ import CommentList from './components/CommentList';
 import ProtectedRoute from './components/ProtectedRoute';
 import CommentForm from './components/CommentForm';
 import Layout from './components/Layout';
+import EditComment from './components/EditComment';
 
 function App() {
 
@@ -33,6 +34,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+           <Route
+              path="/comments/edit/:id" 
+              element={
+                <ProtectedRoute>
+                  <EditComment />
+                </ProtectedRoute>
+              }
+            />
           <Route path="/" element={<Navigate to="/comments" />} />
       </Routes>
     </Router>
