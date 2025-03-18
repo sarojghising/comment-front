@@ -58,3 +58,19 @@ li h3 {
 li p {
   margin: 5px 0;
 }
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.logoutbtn {
+  margin-top: 10px;
+  text-decoration: none;
+  float: right;
+
+}
+
+.action_container {
+  display: flex;
+  justify-content: end;
+}

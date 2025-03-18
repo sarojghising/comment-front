@@ -5,12 +5,15 @@ import Login from './components/Login';
 import Register from './components/Register';
 import CommentList from './components/CommentList';
 import ProtectedRoute from './components/ProtectedRoute';
+import CommentForm from './components/CommentForm';
+import Layout from './components/Layout';
 
 function App() {
 
   return (
     <Provider store={store}>
     <Router>
+    <Layout />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -19,6 +22,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CommentList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/comments/create"
+            element={
+              <ProtectedRoute>
+                <CommentForm />
               </ProtectedRoute>
             }
           />
